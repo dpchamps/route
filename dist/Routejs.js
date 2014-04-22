@@ -9,7 +9,7 @@
 var Route = function(data) {
     //set defaults
     var
-        path = '/ajax',
+        path = 'ajax',
         extension = '.html',
         routes = {
             default : {
@@ -21,21 +21,19 @@ var Route = function(data) {
             }
         };
 
+
     this.path = data.hasOwnProperty('path') ? data.path : path;
     this.extension = data.hasOwnProperty('extension') ? data.extension : extension;
     this.routes = data.hasOwnProperty('routes') ? data.routes : routes;
+
     //an empty state object for now. We'll manipulate this within url changes.
     this.stateObject = {
-        route : ""
+        page : ""
     };
     //currentRoute, holds a route object
     this.currentRoute = {};
-    //if the browser supports history API use it, else fall back to hashbangs
+    //if the browser supports history API use it.
     this.historyAPIsupport = !!(root.history && root.history.pushState);
-
-    //regex expressions for hashbang fallback
-    //the hash begins with a hash and is followed by any character
-    this.isHash = /^#.*/;
     //capture chars after a hash character.
     this.captureHash = /#(.*)/;
 
@@ -45,36 +43,68 @@ var Route = function(data) {
 Route.prototype.init = function(){
     var that = this;
     if(this.historyAPIsupport){
-        root.onpopstate = function(e){
-            e.preventDefault();
-            if( that.routes.hasOwnProperty(that.currentRoute) ){
-                that.getPage(that.currentRoute);
-            }else{
-                that.setRoute( that.routes['default'] );
-            }
-        };
-    }else{
-        root.hashchange = function(e){
-            e.preventDefault();
-            if( that.routes.hasOwnProperty(that.currentRoute) ){
-                that.getpage(that.currentRoute);
-            }else{
-                that.setRoute( that.routes['default'] );
+        root.onpopstate = function(){
+            var route = that.getRoute();
+            if( route.name !== that.currentRoute.name ){
+                that.setRoute(route);
             }
         };
     }
-};
 
+    root.onhashchange = function(){
+        var route = that.getRoute();
+        if( route.name !== that.currentRoute.name ){
+            that.setRoute(route);
+        }else{
+            root.location.hash = "";
+        }
+    };
+
+    //if the page is being loaded for the first time
+    root.onload = function(){
+        var route = that.getRoute();
+        that.setRoute(route);
+    };
+
+};
+Route.prototype.getRoute = function(){
+    var route,
+        pathArray = root.location.pathname.split('/'),
+        lastPath = pathArray[pathArray.length-1],
+        hash = root.location.hash;
+
+    //first check if there is a hash, which is one way to navigate
+    if( hash !== ""){
+        route = this.captureHash.exec(hash)[1];
+    }else{
+        //there is no hash, so either the page is being loaded for the first time, or a popstate was fired
+        route = lastPath;
+    }
+
+    //validate the route, fall back to default
+    if( this.routes.hasOwnProperty(route) ){
+        route = this.routes[route];
+    }else{
+        route = this.routes.default;
+    }
+
+    return route;
+};
 Route.prototype.setRoute = function(route){
+
+    //no validation occurs, as this shouldn't be used without getRoute()
     this.currentRoute = route;
     this.stateObject.route = this.currentRoute.name;
+
+    //push the history
     if(this.historyAPIsupport){
-        root.history.pushState(this.stateObject, this.currentRoute.name, this.currentRoute.name);
+        root.history.replaceState(this.stateObject, this.currentRoute.name, this.currentRoute.name);
     }else{
         root.location = "#"+this.currentRoute.name;
     }
-};
 
+    this.getPage(this.currentRoute);
+};
 
 Route.prototype.getPage = function(route){
     var xmlhttp = new root.XMLHttpRequest(),
@@ -123,9 +153,6 @@ Route.prototype.getPage = function(route){
     xmlhttp.send();
 
 };
-
-
-// Export to the root, which is probably `window`.
 root.Route = Route;
 
 
