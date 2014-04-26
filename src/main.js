@@ -52,7 +52,7 @@ Route.prototype.init = function(){
 
     //so we don't go overriding anything
     if(root.body.id === "" && this.routes.default.name === "body"){
-        root.body.id = "body"
+        root.body.id = "body";
     }else if(root.body.id !== "" && this.routes.default.name === "body"){
         this.routes.default.name = root.body.id;
     }

@@ -11,7 +11,7 @@ var Route = function(data) {
         extension = '.html',
         defaultRoute = {
             name : 'index',
-            node : 'body',
+            node : undefined,
             callback : function(){
                 //an empty function;
             }
@@ -40,7 +40,7 @@ var Route = function(data) {
     this.historyAPIsupport = !!(root.history && root.history.pushState);
     //capture chars after a hash character.
     this.captureHash = /#(.*)/;
-    
+
     this.init();
 };
 
@@ -57,11 +57,10 @@ Route.prototype.init = function(){
 
     //so we don't go overriding anything
     if(root.body.id === "" && this.routes.default.name === "body"){
-        root.body.id = "body"
+        root.body.id = "body";
     }else if(root.body.id !== "" && this.routes.default.name === "body"){
         this.routes.default.name = root.body.id;
     }
-
     root.onhashchange = function(){
         var route = that.getRoute();
         if( route.name !== that.currentRoute.name ){
@@ -133,13 +132,11 @@ Route.prototype.setRoute = function(route){
 
 Route.prototype.getPage = function(route){
     var xmlhttp = new root.XMLHttpRequest(),
-        that = this;
+        that = this,
+        target = this.path + "/" + this.currentRoute.name + this.extension;
 
 
     xmlhttp.onreadystatechange = function(){
-        console.log(xmlhttp.readyState, xmlhttp.status,": ", that.path + "/" + that.currentRoute.name + that.extension);
-        console.log(xmlhttp);
-
         var nodeId = "", //where we'll be attaching the content
             responseBody = "";
         if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
@@ -184,7 +181,7 @@ Route.prototype.getPage = function(route){
         }
     };
 
-    xmlhttp.open("GET", this.path + "/" + this.currentRoute.name + this.extension);
+    xmlhttp.open("GET", target);
     xmlhttp.send(null);
 
 };
