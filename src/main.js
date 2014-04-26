@@ -70,14 +70,15 @@ Route.prototype.getRoute = function(){
     var route,
         pathArray = root.location.pathname.split('/'),
         lastPath = pathArray[pathArray.length-1],
-        hash = root.location.hash;
+        hash = root.location.hash,
+        isHash = true;
 
     //first check if there is a hash, which is one way to navigate
     if( hash !== ""){
         route = this.captureHash.exec(hash)[1];
     }else{
         //there is no hash, so either the page is being loaded for the first time, or a popstate was fired
-
+        isHash = false;
         //first check to see if we're at the root, if so the route should goto the default
         if(lastPath === ""){
             route = "default";
@@ -86,18 +87,24 @@ Route.prototype.getRoute = function(){
 
         }
     }
-
-    //validate the route, fall back to default
-    if( this.routes.hasOwnProperty(route) ){
+    if(this.routes.hasOwnProperty(route) ){
         route = this.routes[route];
+    }
+    //the route doesn't exist, but it's an anchor. We want to keep default anchors to keep default functionality.
+    else if(isHash){
+        route = {
+            anchor : true
+        };
     }else{
         route = this.resolve;
     }
-
     return route;
 };
 Route.prototype.setRoute = function(route){
-
+    //the route doesn't exist but is an anchor.
+    if(route.hasOwnProperty('anchor')){
+        return;
+    }
     //no validation occurs, as this shouldn't be used without getRoute()
     this.currentRoute = route;
     this.stateObject.route = this.currentRoute.name;
@@ -114,9 +121,10 @@ Route.prototype.setRoute = function(route){
 
 Route.prototype.getPage = function(route){
     var xmlhttp = new root.XMLHttpRequest(),
-        that = this;
+        that = this,
+        target = this.path + "/" + this.currentRoute.name + this.extension;
 
-    xmlhttp.open("GET", this.path + "/" + this.currentRoute.name + this.extension);
+
     xmlhttp.onreadystatechange = function(){
         var nodeId = "", //where we'll be attaching the content
             responseBody = "";
@@ -161,7 +169,9 @@ Route.prototype.getPage = function(route){
             }
         }
     };
-    xmlhttp.send();
+
+    xmlhttp.open("GET", target);
+    xmlhttp.send(null);
 
 };
 root.Route = Route;

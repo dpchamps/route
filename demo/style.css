@@ -1,0 +1,22 @@
+a{
+    display: block;
+    margin: 1em 0;
+    font-size: 20px;
+}
+#long-div{
+    height: 10000px;
+}
+
+#ajax-content {
+    max-width: 740px;
+    width: 100%;
+    position: relative;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#anchor{
+    font-size: 70px;
+    font-family: "Trebuchet MS", Verdana, sans-serif;
+    font-style: italic;
+}
