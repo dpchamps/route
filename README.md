@@ -49,20 +49,30 @@ and will fallback to:
                     name: "about",
                     node: "ajax-content",
                     callback: seperateFunc
+                },
+                home:{
+                    name: "home",
+                    node: "ajax-content",
+                    callback: function(){
+
+                    }
+                },
+                _404:{
+                    name: "404",
+                    node: "body",
+                    callback: function(){};
                 }
             },
+            resolve: "_404",
             path: 'path/to/ajax/content',
             extension: '.whateveryourcontentis',
 
+
         });
 
-...And that's about it.
 
-As of now, it's only going to return strings from XMLHttpRequests, but I'll probably update it later.
 
-### routes
-
- + An object that contains route objects
+As of now, XHR responseText is placed in the route node.
 
 ### route objects
 
@@ -85,11 +95,45 @@ When the previous file is requested without a node definition, RouteJs looks for
 
 **Don't use both a node definition and a node wrapper at the same time.**
 
-**Also note**
+#### Default
 
- You must supply a route named 'default'.
+ If you do not supply a default router, a default will be provided as follows:
 
- There is, as of yet, no error checking for this. So if you don't include it, the Router will break.
+        defaultRoute = {
+            name : 'index',
+            node : "body",
+            callback : function(){
+                //an empty function;
+            }
+         }
+
+
+### resolve
+
+ex:
+        resolve : "_404"
+
+  + the where to go if the user attempts to navigate to a route not defined, or is 404 is returned from server*.
+  + defaults to `_404` if present, otherwise `default`.
+
+#### The difference between `resolve` and `default`
+
+Where both can be the same route, `resolve` is used to handle missing pages (i.e. improperly defined routes or
+non-existent pages). `default` is used if content is found, but no node exists to place that content.
+
+ For example:
+
+ from the definition about, a user trying to navigate to www.example.com/directions, would get a "page not found".
+
+ now let's say that we added a route as follows:
+
+        contact : {
+             name: "contact",
+             node: null,
+             callback: function(){}
+        }
+
+ navigating to www.example.com/contact, would result in redirecting the user to the home page.
 
 ### path
 
@@ -99,3 +143,14 @@ When the previous file is requested without a node definition, RouteJs looks for
 ### extension
 
   + Self explanatory, defaults to '.html'
+
+# * On 404 status.
+
+Do to the Apache rewrite rule, no ajax requests (other than index.html) in any given folder will be returned as 404.
+
+This is because Apache is redirecting any links to the index that are not actual files or directories.
+
+Any file you request via ajax that does not exist will return the entire body of original index.html as responseText.
+
+I have not yet found a good way of dealing with this yet, other than ensuring that you do not define routes to files
+that do not exist.
