@@ -3,28 +3,32 @@
   "use strict";
 
 
-/* Routejs main */
-
 // Base function.
 var Route = function(data) {
     //set defaults
     var
         path = 'ajax',
         extension = '.html',
-        routes = {
-            default : {
-                name : 'index',
-                node : undefined,
-                callback : function(){
-                    //an empty function;
-                }
+        defaultRoute = {
+            name : 'index',
+            node : undefined,
+            callback : function(){
+                //an empty function;
             }
         };
 
 
     this.path = data.hasOwnProperty('path') ? data.path : path;
     this.extension = data.hasOwnProperty('extension') ? data.extension : extension;
-    this.routes = data.hasOwnProperty('routes') ? data.routes : routes;
+    this.routes = data.hasOwnProperty('routes') ? data.routes : {};
+    //check to see if there is a default route, we have to have one
+    if(!this.routes.hasOwnProperty('default')){
+        this.routes.default = defaultRoute;
+    }
+    this._404 = this.routes.hasOwnProperty("_404") ? true : false;
+    //resolve to default, or _404 if it's defined, or whatever the user wants it to be.
+    this.resolve = data.hasOwnProperty('resolve') ? data.resolve : (this._404 ? data.routes._404 : data.routes.default);
+
 
     //an empty state object for now. We'll manipulate this within url changes.
     this.stateObject = {
@@ -78,14 +82,21 @@ Route.prototype.getRoute = function(){
         route = this.captureHash.exec(hash)[1];
     }else{
         //there is no hash, so either the page is being loaded for the first time, or a popstate was fired
-        route = lastPath;
+
+        //first check to see if we're at the root, if so the route should goto the default
+        if(lastPath === ""){
+            route = "default";
+        }else{
+            route = lastPath;
+
+        }
     }
 
     //validate the route, fall back to default
     if( this.routes.hasOwnProperty(route) ){
         route = this.routes[route];
     }else{
-        route = this.routes.default;
+        route = this.resolve;
     }
 
     return route;
@@ -148,12 +159,16 @@ Route.prototype.getPage = function(route){
             root.document.getElementById(nodeId).innerHTML = responseBody;
             //and fire the callback
             that.currentRoute.callback();
+        }else{
+            if(xmlhttp.status == 404){
+                //uh oh, not found
+                that.setRoute(that.resolve);
+            }
         }
     };
     xmlhttp.send();
 
 };
 root.Route = Route;
-
 
 }(this));
