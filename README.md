@@ -70,11 +70,6 @@ and will fallback to:
 
         });
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> readme
 As of now, XHR responseText is placed in the route node.
 
 ### route objects
@@ -113,11 +108,8 @@ When the previous file is requested without a node definition, RouteJs looks for
 
 ### resolve
 
-<<<<<<< HEAD
  If you do not supply a default router, a default will be provided as follows:
 
-
-=======
 ex:
         resolve : "_404"
 
@@ -142,7 +134,7 @@ non-existent pages). `default` is used if content is found, but no node exists t
         }
 
  navigating to www.example.com/contact, would result in redirecting the user to the home page.
->>>>>>> readme
+
 
 ### path
 
