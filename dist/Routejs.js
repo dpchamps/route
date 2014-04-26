@@ -11,7 +11,7 @@ var Route = function(data) {
         extension = '.html',
         defaultRoute = {
             name : 'index',
-            node : undefined,
+            node : 'body',
             callback : function(){
                 //an empty function;
             }
@@ -53,6 +53,13 @@ Route.prototype.init = function(){
                 that.setRoute(route);
             }
         };
+    }
+
+    //so we don't go overriding anything
+    if(root.body.id === "" && this.routes.default.name === "body"){
+        root.body.id = "body"
+    }else if(root.body.id !== "" && this.routes.default.name === "body"){
+        this.routes.default.name = root.body.id;
     }
 
     root.onhashchange = function(){
