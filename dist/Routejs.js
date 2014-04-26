@@ -40,7 +40,7 @@ var Route = function(data) {
     this.historyAPIsupport = !!(root.history && root.history.pushState);
     //capture chars after a hash character.
     this.captureHash = /#(.*)/;
-
+    
     this.init();
 };
 

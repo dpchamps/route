@@ -9,7 +9,7 @@
         var myRoutes = new Route({
             routes:{
                 default : {
-                    name: 'index',
+                    name: 'home',
                     node: 'ajax-content',
                     callback: function(){
                         console.log("default page loaded");
@@ -36,11 +36,7 @@
                         console.log("demo page loaded");
                     }
                 },
-                notReal : {
-                    name: "burritto",
-                    node: 'ajax-content',
-                    callback : function(){console.log("suck me beautiful");}
-                }
+
 
             }
         });
