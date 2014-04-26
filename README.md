@@ -58,11 +58,7 @@ and will fallback to:
 
 ...And that's about it.
 
-As of now, it's only going to return strings from XMLHttpRequests, but I'll probably update it later.
-
-### routes
-
- + An object that contains route objects
+As of now, XHR responseText is placed in the route node.
 
 ### route objects
 
@@ -87,9 +83,9 @@ When the previous file is requested without a node definition, RouteJs looks for
 
 **Also note**
 
- You must supply a route named 'default'.
+ If you do not supply a default router, a default will be provided as follows:
 
- There is, as of yet, no error checking for this. So if you don't include it, the Router will break.
+
 
 ### path
 
