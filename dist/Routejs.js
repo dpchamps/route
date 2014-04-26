@@ -67,14 +67,6 @@ Route.prototype.init = function(){
 
     //if the page is being loaded for the first time
     root.onload = function(){
-
-        //so we don't go overriding anything
-        if(root.document.body.getAttribute('id') === null && that.routes.default.name === "body"){
-            root.document.body.id = "body";
-        }else if(root.document.body.getAttribute('if') !== null && that.routes.default.name === "body"){
-            that.routes.default.name = root.document.body.id;
-        }
-
         var route = that.getRoute();
         that.setRoute(route);
     };

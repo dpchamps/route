@@ -99,12 +99,13 @@ When the previous file is requested without a node definition, RouteJs looks for
 
         defaultRoute = {
             name : 'index',
-            node : "body",
+            node : undefined,
             callback : function(){
                 //an empty function;
             }
          }
 
+ index will 404.
 
 ### resolve
 
